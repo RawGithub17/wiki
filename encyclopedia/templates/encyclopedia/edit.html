@@ -5,7 +5,6 @@
     <form method="POST">
         {% csrf_token %}
         {{form}}
-        <input type="hidden" name="title" value={{title}}>
         <input type="submit" class="btn btn-primary mt-3" value="Save Changes">
     </form>
 {% endblock %}

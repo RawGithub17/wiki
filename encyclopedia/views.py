@@ -15,10 +15,9 @@ def index(request):
 def entry(request, entry):
     entry_md = util.get_entry(entry)
     if entry_md == None:
-        return render(request,'encyclopedia/entry.html', {'content' : "<h1>Page not found</h1>"})
+        return render(request,'encyclopedia/error.html', {'error' : "Page not found"})
     return render(request, 'encyclopedia/entry.html', {
         'content': markdown2.markdown(entry_md),
-        'content_md': entry_md,
         'title': entry
     })
 
@@ -44,24 +43,21 @@ def search(request):
     else:
         return render(request, "encyclopedia/error.html", {'error': 'Please utilize the search bar in order to search'})
 
-def edit(request):
+#bug: every edit makes the .md file more spaced out?
+def edit(request, entry):
     if request.method == 'POST':
-        title = request.POST.get('title')
-        edited_content = request.POST.get('content')
-        content_md = util.get_entry(title)
-
-        if edited_content != None and edited_content != content_md:
-            util.save_entry(title, edited_content)
-            return HttpResponseRedirect(reverse('encyclopedia:entry', args=[title])) 
-        else:
-            data = {'content' : content_md}
-            return render(request, "encyclopedia/edit.html", {
-                'title':title, 'form': EditForm(data)
-            })
+        #submits a change
+        edit_form = EditForm(request.POST)
+        if edit_form.is_valid():
+            util.save_entry(entry, edit_form.cleaned_data["content"])
+            return HttpResponseRedirect(reverse('encyclopedia:entry', args=[entry])) 
     else:
-        return render(request, "encyclopedia/error.html", {'error': 'Please navigate to a page to edit'})
-
-
+        #gets user to the edit page and changes the textbox properly
+        content_md = util.get_entry(entry)
+        data = {'content' : content_md}
+        return render(request, "encyclopedia/edit.html", {
+            'title':entry, 'form': EditForm(data)
+        })
 def new(request):
     if request.method == 'POST':
         form = PostForm(request.POST)
