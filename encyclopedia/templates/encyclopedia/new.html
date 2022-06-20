@@ -4,6 +4,10 @@
 <form method="POST">
     {% csrf_token %}
     {{form}}
-    <input type="submit">
+    <input type="submit" value="Create new post" class="btn btn-primary mt-2">
 </form>
+
+{% if taken %}
+<p>This post has already been created</p>
+{% endif %}
 {% endblock %}
