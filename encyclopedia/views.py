@@ -5,6 +5,7 @@ from django import forms
 
 from . import util
 import markdown2
+import random
 
 def index(request):
     return render(request, "encyclopedia/index.html", {
@@ -76,12 +77,19 @@ def new(request):
         'taken' : False
     })
 
+def random_page(request):
+    entries = util.list_entries()
+    page = random.choice(entries)
+    return HttpResponseRedirect(reverse('encyclopedia:entry', args=[page]))
+
 def duplicates(query):
     entries = util.list_entries()
     for entry in entries:
         if entry.casefold() == query.casefold():
             return True
     return False
+
+
 
 class PostForm(forms.Form):
     title = forms.CharField(widget=forms.TextInput(attrs={'class' : 'form-control'}))
