@@ -18,6 +18,7 @@ def entry(request, entry):
         return render(request,'encyclopedia/entry.html', {'content' : "<h1>Page not found</h1>"})
     return render(request, 'encyclopedia/entry.html', {
         'content': markdown2.markdown(entry_md),
+        'content_md': entry_md,
         'title': entry
     })
 
@@ -40,21 +41,23 @@ def search(request):
             'matches':matches,
             'query' : query
         })
+
 def edit(request):
     if request.method == 'POST':
         title = request.POST.get('title')
-        content = request.POST.get('content')
-        page = request.POST.get('page')
+        edited_content = request.POST.get('content')
+        content_md = util.get_entry(title)
 
-        if page == 'edit':
-            util.save_entry(title, content)
-            print("THIS CHANGES")
+        if edited_content != None and edited_content != content_md:
+            util.save_entry(title, edited_content)
             return HttpResponseRedirect(reverse('encyclopedia:entry', args=[title])) 
-        return render(request, "encyclopedia/edit.html", {
-            'title':title, 'form': EditForm(content)
-        })
+        else:
+            data = {'content' : content_md}
+            return render(request, "encyclopedia/edit.html", {
+                'title':title, 'form': EditForm(data)
+            })
 
-    return HttpResponse("Error: please pick a url to edit")
+    return HttpResponse("Error: please pick an entry and navigate properly to edit")
 
 #NEEDS ERROR MESSAGE!!!!
 def new(request):
@@ -88,5 +91,5 @@ class PostForm(forms.Form):
     content = forms.CharField(widget=forms.Textarea)
 
 class EditForm(forms.Form):
-    content = forms.CharField(widget=forms.Textarea)
+    content = forms.CharField(widget=forms.Textarea(attrs={'class' : 'form-control'}))
 
