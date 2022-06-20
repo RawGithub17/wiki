@@ -41,6 +41,8 @@ def search(request):
             'matches':matches,
             'query' : query
         })
+    else:
+        return render(request, "encyclopedia/error.html", {'error': 'Please utilize the search bar in order to search'})
 
 def edit(request):
     if request.method == 'POST':
@@ -56,10 +58,10 @@ def edit(request):
             return render(request, "encyclopedia/edit.html", {
                 'title':title, 'form': EditForm(data)
             })
+    else:
+        return render(request, "encyclopedia/error.html", {'error': 'Please navigate to a page to edit'})
 
-    return HttpResponse("Error: please pick an entry and navigate properly to edit")
 
-#NEEDS ERROR MESSAGE!!!!
 def new(request):
     if request.method == 'POST':
         form = PostForm(request.POST)
@@ -73,8 +75,6 @@ def new(request):
                 return HttpResponseRedirect(reverse('encyclopedia:entry', args=[title]))
             else:
                 return render(request, 'encyclopedia/new.html', {'form' : form, 'taken' : True})
-
-
     return render(request, 'encyclopedia/new.html', {
         'form' : PostForm(),
         'taken' : False
