@@ -69,11 +69,12 @@ def new(request):
                 util.save_entry(title, content)
                 return HttpResponseRedirect(reverse('encyclopedia:entry', args=[title]))
             else:
-                return render(request, 'encyclopedia/new.html', {'form' : PostForm()})
+                return render(request, 'encyclopedia/new.html', {'form' : form, 'taken' : True})
 
 
     return render(request, 'encyclopedia/new.html', {
-        'form' : PostForm()
+        'form' : PostForm(),
+        'taken' : False
     })
 
 def duplicates(query):
@@ -84,8 +85,8 @@ def duplicates(query):
     return False
 
 class PostForm(forms.Form):
-    title = forms.CharField()
-    content = forms.CharField(widget=forms.Textarea)
+    title = forms.CharField(widget=forms.TextInput(attrs={'class' : 'form-control'}))
+    content = forms.CharField(widget=forms.Textarea(attrs={'class' : 'form-control'}))
 
 class EditForm(forms.Form):
     content = forms.CharField(widget=forms.Textarea)
